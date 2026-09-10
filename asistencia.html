@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asistencia en Predio</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#eef1ef;
+    --panel:#ffffff;
+    --ink:#151a18;
+    --ink-soft:#5b6663;
+    --line:#d3dad6;
+    --accent:#0f6b4f;
+    --accent-soft:#e2efe9;
+    --warn:#a8442a;
+    --warn-soft:#f6e6e0;
+    --hold:#8a6d1f;
+    --hold-soft:#f6efd9;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(21,26,24,.06),0 8px 24px rgba(21,26,24,.07);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#101513;
+      --panel:#171e1b;
+      --ink:#e8efeb;
+      --ink-soft:#93a19c;
+      --line:#2a3531;
+      --accent:#4fc79b;
+      --accent-soft:#122a22;
+      --warn:#e08a6f;
+      --warn-soft:#2c1a15;
+      --hold:#d8bc6a;
+      --hold-soft:#2a2415;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#101513;
+    --panel:#171e1b;
+    --ink:#e8efeb;
+    --ink-soft:#93a19c;
+    --line:#2a3531;
+    --accent:#4fc79b;
+    --accent-soft:#122a22;
+    --warn:#e08a6f;
+    --warn-soft:#2c1a15;
+    --hold:#d8bc6a;
+    --hold-soft:#2a2415;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground);
+    color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+    line-height:1.5;
+    padding:24px 16px 48px;
+    display:flex;justify-content:center;
+  }
+  .wrap{width:100%;max-width:520px;display:flex;flex-direction:column;gap:18px}
+  header{display:flex;flex-direction:column;gap:6px}
+  .eyebrow{
+    font-family:"Archivo",system-ui,sans-serif;
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-soft);font-weight:600;
+  }
+  h1{
+    font-family:"Archivo",system-ui,sans-serif;
+    font-size:26px;line-height:1.15;margin:0;font-weight:700;text-wrap:balance;
+  }
+  .sub{margin:0;color:var(--ink-soft);font-size:14px}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:20px;display:flex;flex-direction:column;gap:14px;
+  }
+  .status{display:flex;gap:12px;align-items:flex-start}
+  .dot{
+    width:10px;height:10px;border-radius:50%;background:var(--ink-soft);
+    margin-top:7px;flex:0 0 auto;
+  }
+  .status-text{display:flex;flex-direction:column;gap:2px}
+  .status-title{font-weight:600;font-size:16px;font-family:"Archivo",sans-serif}
+  .status-detail{font-size:13.5px;color:var(--ink-soft)}
+  button{
+    font:inherit;font-weight:600;cursor:pointer;
+    border:1px solid transparent;border-radius:10px;
+    padding:13px 18px;width:100%;
+    background:var(--accent);color:var(--panel);
+    transition:filter .15s ease;
+  }
+  button:hover{filter:brightness(1.06)}
+  button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  button[disabled]{opacity:.5;cursor:not-allowed}
+  a.cta{
+    display:block;text-align:center;text-decoration:none;
+    background:var(--accent);color:var(--panel);font-weight:600;
+    border-radius:10px;padding:13px 18px;
+  }
+  .metrics{
+    display:grid;grid-template-columns:1fr 1fr;gap:1px;
+    background:var(--line);border-radius:10px;overflow:hidden;
+  }
+  .metric{background:var(--panel);padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+  .metric .k{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;font-family:"Archivo",sans-serif}
+  .metric .v{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;font-family:"Archivo",sans-serif}
+  .note{font-size:12.5px;color:var(--ink-soft);margin:0}
+  .chip{
+    display:inline-block;font-size:11px;font-weight:600;letter-spacing:.06em;
+    text-transform:uppercase;padding:4px 9px;border-radius:999px;
+    background:var(--accent-soft);color:var(--accent);width:fit-content;
+    font-family:"Archivo",sans-serif;
+  }
+  .chip.warn{background:var(--warn-soft);color:var(--warn)}
+  .chip.hold{background:var(--hold-soft);color:var(--hold)}
+  .rules{margin:0;padding-left:18px;font-size:13px;color:var(--ink-soft);display:flex;flex-direction:column;gap:5px}
+  .cfg{
+    border-top:1px dashed var(--line);padding-top:14px;font-size:12.5px;
+    color:var(--ink-soft);display:none;flex-direction:column;gap:8px;
+  }
+  .cfg.on{display:flex}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
+    background:var(--ground);border:1px solid var(--line);border-radius:6px;
+    padding:8px 10px;display:block;overflow-x:auto;white-space:pre;color:var(--ink);
+  }
+  footer{font-size:12px;color:var(--ink-soft);text-align:center}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Práctica Profesionalizante I · Logística</span>
+    <h1>Asistencia con validación de presencia</h1>
+    <p class="sub">ISFD Saladas — Alvear 1491, Saladas, Corrientes. El formulario se habilita solo dentro del predio.</p>
+  </header>
+
+  <div class="panel">
+    <div class="status">
+      <span class="dot" id="dot"></span>
+      <div class="status-text">
+        <span class="status-title" id="stitle">Ubicación sin verificar</span>
+        <span class="status-detail" id="sdetail">Tocá el botón y aceptá el permiso de ubicación del navegador.</span>
+      </div>
+    </div>
+
+    <div class="metrics" id="metrics" hidden>
+      <div class="metric"><span class="k">Distancia</span><span class="v" id="mdist">—</span></div>
+      <div class="metric"><span class="k">Precisión GPS</span><span class="v" id="macc">—</span></div>
+    </div>
+
+    <button id="check" class="primary">Verificar mi ubicación</button>
+    <div id="slot"></div>
+
+    <div class="cfg" id="cfg">
+      <span class="chip hold">Modo docente</span>
+      <p class="note">Parado dentro del instituto, verificá la ubicación y pegá estas coordenadas en el código (constante <code style="display:inline;padding:1px 4px">SEDE</code>) para fijar el centro exacto.</p>
+      <code id="cfgout">Todavía sin lectura GPS.</code>
+    </div>
+  </div>
+
+  <div class="panel">
+    <span class="chip">Cómo funciona</span>
+    <ul class="rules">
+      <li>Radio permitido: 150 metros desde el instituto.</li>
+      <li>El navegador pide permiso de ubicación: hay que aceptarlo. Si se rechaza, no hay asistencia.</li>
+      <li>Conviene estar con el GPS del celular encendido y, si es posible, cerca de una ventana o al aire libre.</li>
+      <li>Una lectura con precisión mayor a 100 m se considera poco confiable y pide reintentar.</li>
+    </ul>
+  </div>
+
+  <footer>Registro válido solo el día de clase · Cátedra Práctica Profesionalizante I</footer>
+</div>
+
+<script>
+  // ── Configuración ──────────────────────────────────────────────
+  const SEDE = { lat: -28.25430, lon: -58.62520 };  // ISFD Saladas — Alvear 1491
+  const RADIO_M = 150;
+  const FORM_URL = "https://docs.google.com/forms/d/1NcXPup5OaJKjYO6Krt8-pvgfN2UjTgvsJXDm8tLWHOQ/viewform";
+  const PRECISION_MAX = 100; // metros
+  // ───────────────────────────────────────────────────────────────
+
+  const $ = id => document.getElementById(id);
+  if (location.hash === "#config") $("cfg").classList.add("on");
+
+  function distancia(aLat, aLon, bLat, bLon){
+    const R = 6371000, r = Math.PI/180;
+    const dLat = (bLat-aLat)*r, dLon = (bLon-aLon)*r;
+    const h = Math.sin(dLat/2)**2 + Math.cos(aLat*r)*Math.cos(bLat*r)*Math.sin(dLon/2)**2;
+    return 2*R*Math.asin(Math.sqrt(h));
+  }
+
+  function estado(tipo, titulo, detalle){
+    const colores = { ok:"var(--accent)", no:"var(--warn)", esperando:"var(--hold)", neutro:"var(--ink-soft)" };
+    $("dot").style.background = colores[tipo];
+    $("stitle").textContent = titulo;
+    $("sdetail").textContent = detalle;
+  }
+
+  $("check").addEventListener("click", () => {
+    if (!navigator.geolocation){
+      estado("no","Este dispositivo no informa ubicación","Probá desde el celular con un navegador actualizado.");
+      return;
+    }
+    $("check").disabled = true;
+    $("slot").innerHTML = "";
+    estado("esperando","Buscando señal…","Puede tardar unos segundos. No cierres la página.");
+
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude:lat, longitude:lon, accuracy:acc } = pos.coords;
+      const d = distancia(SEDE.lat, SEDE.lon, lat, lon);
+
+      $("metrics").hidden = false;
+      $("mdist").textContent = Math.round(d) + " m";
+      $("macc").textContent = "± " + Math.round(acc) + " m";
+      $("cfgout").textContent = "const SEDE = { lat: " + lat.toFixed(5) + ", lon: " + lon.toFixed(5) + " };";
+      $("check").disabled = false;
+
+      if (acc > PRECISION_MAX){
+        estado("esperando","Señal poco precisa","La lectura tiene un margen de ±" + Math.round(acc) + " m. Salí al patio o a la vereda y volvé a intentar.");
+        $("check").textContent = "Reintentar";
+        return;
+      }
+
+      if (d <= RADIO_M){
+        estado("ok","Estás en el instituto","A " + Math.round(d) + " m del punto de referencia. Ya podés registrar la asistencia.");
+        $("check").textContent = "Verificar de nuevo";
+        const a = document.createElement("a");
+        a.className = "cta";
+        a.href = FORM_URL;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.textContent = "Abrir el formulario de asistencia";
+        $("slot").appendChild(a);
+      } else {
+        estado("no","Fuera del radio permitido","Estás a " + Math.round(d) + " m del instituto; el máximo es " + RADIO_M + " m. Acercate y volvé a verificar.");
+        $("check").textContent = "Reintentar";
+      }
+    }, err => {
+      $("check").disabled = false;
+      $("check").textContent = "Reintentar";
+      const msg = {
+        1: ["Permiso de ubicación denegado","Habilitá la ubicación para este sitio en la configuración del navegador y recargá la página."],
+        2: ["No se pudo obtener la posición","Activá el GPS del dispositivo y probá de nuevo."],
+        3: ["Se agotó el tiempo de búsqueda","La señal tardó demasiado. Movete a un lugar abierto y reintentá."]
+      }[err.code] || ["No se pudo verificar la ubicación","Reintentá en unos segundos."];
+      estado("no", msg[0], msg[1]);
+    }, { enableHighAccuracy:true, timeout:20000, maximumAge:0 });
+  });
+</script>
+
+</body>
+</html>
