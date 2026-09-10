@@ -185,7 +185,7 @@
   const FORM_URL = "https://docs.google.com/forms/d/1NcXPup5OaJKjYO6Krt8-pvgfN2UjTgvsJXDm8tLWHOQ/viewform";
   const PRECISION_MAX = 100; // metros
   const SECRET = "saladas-logistica-2026";  // debe coincidir con profe.html
-  const VENTANA = 30;                        // segundos por código
+  const VENTANA = Number(new URLSearchParams(location.search).get("v")) || 30;
   const TOLERANCIA = 2;                      // ventanas de gracia (reloj desfasado)
   // ───────────────────────────────────────────────────────────────
 
@@ -203,7 +203,7 @@
     if (!t) return false;
     const s = Math.floor(Date.now() / (VENTANA * 1000));
     for (let i = -TOLERANCIA; i <= TOLERANCIA; i++){
-      if (hash(SECRET + ":" + (s + i)) === t) return true;
+      if (hash(SECRET + ":" + VENTANA + ":" + (s + i)) === t) return true;
     }
     return false;
   }
