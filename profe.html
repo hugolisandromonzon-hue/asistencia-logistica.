@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantalla de asistencia</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<style>
+  :root{
+    --ground:#0e1412; --panel:#ffffff; --ink:#f0f5f2; --ink-soft:#93a19c;
+    --accent:#4fc79b; --line:#2a3531;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; background:var(--ground); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:22px; padding:28px 16px;
+  }
+  h1{font-family:"Archivo",sans-serif; font-size:22px; margin:0; text-align:center; text-wrap:balance}
+  .sub{margin:0; color:var(--ink-soft); font-size:14px; text-align:center; max-width:34ch}
+  #qr{
+    background:var(--panel); padding:18px; border-radius:16px; line-height:0;
+    box-shadow:0 10px 40px rgba(0,0,0,.45);
+  }
+  #qr img, #qr canvas{display:block; max-width:100%; height:auto}
+  .timer{
+    font-family:"Archivo",sans-serif; font-size:15px; font-weight:600;
+    color:var(--accent); letter-spacing:.04em; font-variant-numeric:tabular-nums;
+  }
+  .hint{font-size:12.5px; color:var(--ink-soft); text-align:center; max-width:40ch; margin:0}
+</style>
+</head>
+<body>
+  <h1>Asistencia — Práctica Profesionalizante I</h1>
+  <p class="sub">Escaneá este código con la cámara del celular. Se renueva solo.</p>
+  <div id="qr"></div>
+  <div class="timer" id="timer">—</div>
+  <p class="hint">Mostrá esta pantalla en el aula. Un código fotografiado deja de servir a los pocos segundos.</p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  // ── Configuración ─────────────────────────────────────────────
+  const BASE   = "https://hugolisandromonzon-hue.github.io/asistencia-logistica./asistencia.html";
+  const SECRET = "saladas-logistica-2026";
+  const VENTANA = 30; // segundos que dura cada código
+  // ──────────────────────────────────────────────────────────────
+
+  function hash(txt){
+    let h = 5381;
+    for (let i = 0; i < txt.length; i++) h = ((h * 33) ^ txt.charCodeAt(i)) >>> 0;
+    return h.toString(36);
+  }
+  const slotActual = () => Math.floor(Date.now() / (VENTANA * 1000));
+
+  const caja = document.getElementById("qr");
+  let qr = null, ultimoSlot = null;
+
+  function pintar(){
+    const s = slotActual();
+    if (s !== ultimoSlot){
+      ultimoSlot = s;
+      const url = BASE + "?t=" + hash(SECRET + ":" + s);
+      if (qr){ qr.clear(); qr.makeCode(url); }
+      else { qr = new QRCode(caja, { text:url, width:280, height:280, correctLevel:QRCode.CorrectLevel.M }); }
+    }
+    const restan = VENTANA - Math.floor((Date.now() / 1000) % VENTANA);
+    document.getElementById("timer").textContent = "Se renueva en " + restan + " s";
+  }
+
+  pintar();
+  setInterval(pintar, 500);
+</script>
+</body>
+</html>
